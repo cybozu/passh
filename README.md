@@ -1,17 +1,17 @@
-pssh
-====
+passh
+=====
 
-pssh is a Python3 library to run a number of SSH processes in parallel.  
-As pssh uses [asyncio][], it requires Python 3.4 or newer.
+passh (Parallel Asynchronous SSH) is a Python3 library to run a number of SSH processes in parallel.  
+As passh uses [asyncio][], it requires Python 3.4 or newer.
 
 Features
 --------
 
-* `Pssh` class to run SSH in parallel.
+* `PAssh` class to run SSH in parallel.
   * SSH outputs are forwarded to local stdout/stderr.  
     Every line is to be prefixed by the remote hostname.
   * Instead of forwarding, SSH outputs can be collected in memory for later use.
-* Easy to integrate `Pssh` into your asyncio application.
+* Easy to integrate `PAssh` into your asyncio application.
 * A file can be given as inputs for all SSH processes.
 * Limit on the number of simultaneous SSH processes.
 * Built-in command-line interface.
@@ -20,13 +20,13 @@ Command-line
 ------------
 
 ```
-pssh.py [-i FILE] host1,host2,... COMMAND [arg1 arg2 ...]
+passh.py [-i FILE] host1,host2,... COMMAND [arg1 arg2 ...]
 ```
 
 ### Invoke "date" at once.
 
 ```
-$ ./pssh.py host-1,host-2,host-3 date
+$ ./passh.py host-1,host-2,host-3 date
 [host-3] Sat May 23 07:20:22 UTC 2015
 [host-1] Sat May 23 07:20:22 UTC 2015
 [host-2] Sat May 23 07:20:22 UTC 2015
@@ -35,7 +35,7 @@ $ ./pssh.py host-1,host-2,host-3 date
 ### Send a file at once.
 
 ```
-$ ./pssh.py -i $HOME/.bashrc host-1,host-2,host-3 dd of=$HOME/.bashrc
+$ ./passh.py -i $HOME/.bashrc host-1,host-2,host-3 dd of=$HOME/.bashrc
 [host-2] 7+1 records in
 [host-2] 7+1 records out
 [host-2] 3650 bytes (3.6 kB) copied, 3.0315e-05 s, 120 MB/s
@@ -50,11 +50,11 @@ $ ./pssh.py -i $HOME/.bashrc host-1,host-2,host-3 dd of=$HOME/.bashrc
 Python module
 -------------
 
-### Use Pssh.run() for non-asyncio application.
+### Use PAssh.run() for non-asyncio application.
 
 ```
->>> import pssh
->>> p = pssh.Pssh(['host-1', 'host-2', 'host-3'], ['date'], use_stdout=True)
+>>> import passh
+>>> p = passh.PAssh(['host-1', 'host-2', 'host-3'], ['date'], use_stdout=True)
 >>> p.run()
 True
 >>> from pprint import pprint
@@ -64,14 +64,14 @@ True
  'host-3': b'Sat May 23 07:30:07 UTC 2015\n'}
 ```
 
-### Embed Pssh into your asyncio application.
+### Embed PAssh into your asyncio application.
 
 ```python
-import asyncio, pssh
+import asyncio, passh
 
-p = pssh.Pssh(['host-1', 'host-2'], 'date')
+p = passh.PAssh(['host-1', 'host-2'], 'date')
 task = asyncio.async(p.wait())
-task.add_done_callback(lambda x: ...)  # Use Pssh results.
+task.add_done_callback(lambda x: ...)  # Use PAssh results.
 ```
 
 License

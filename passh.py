@@ -13,7 +13,7 @@ import sys
 
 
 # Constants
-__all__ = ['Pssh']
+__all__ = ['PAssh']
 _SSH = ('ssh', '-T', '-o', 'LogLevel=ERROR', '-o', 'ConnectTimeout=6')
 _INSECURE_OPTS = (
     '-o', 'StrictHostKeyChecking=no',
@@ -22,8 +22,8 @@ _INSECURE_OPTS = (
 
 
 # Implementation
-class PsshProtocol(asyncio.SubprocessProtocol):
-    '''An asyncio.SubprocessProtocol for Pssh.'''
+class PAsshProtocol(asyncio.SubprocessProtocol):
+    '''An asyncio.SubprocessProtocol for PAssh.'''
     def __init__(self, hostname: str,
                  exit_future: asyncio.Future, use_stdout: bool):
         self._hostname = hostname
@@ -99,7 +99,7 @@ class PsshProtocol(asyncio.SubprocessProtocol):
         self._flush(self._stderr, sys.stderr.buffer)
 
 
-class Pssh:
+class PAssh:
     '''Executes SSH in parallel for given hosts.
 
     This will run SSH on multiple hosts in parallel and output or
@@ -173,7 +173,7 @@ class Pssh:
         cmd += self._args
         proc = self._loop.subprocess_exec(
             functools.partial(
-                PsshProtocol, host, exit_future, self._use_stdout,
+                PAsshProtocol, host, exit_future, self._use_stdout,
             ), *cmd, stdin=stdin)
         transport, protocol = yield from proc
         yield from exit_future
@@ -202,12 +202,12 @@ class Pssh:
     def wait(self, *, timeout=None, return_when=asyncio.ALL_COMPLETED):
         '''Calls asyncio.wait to wait all SSH processes.
 
-        Use asyncio.async (or asyncio.ensure_future) to embed pssh
+        Use asyncio.async (or asyncio.ensure_future) to embed passh
         in your asyncio applications:
 
-            pssh.Pssh([host1, host2], ['date'])
-            task = asyncio.async(pssh.wait())
-            task.add_done_callback(...)  # use Pssh results
+            p = passh.PAssh([host1, host2], ['date'])
+            task = asyncio.async(p.wait())
+            task.add_done_callback(...)  # use PAssh results
 
         Returns:
             A coroutine.
@@ -220,7 +220,7 @@ class Pssh:
         '''Run SSH in parallel.
 
         This invokes loop.run_until_complete() to wait completion
-        of all SSH processes.  If you want to embed pssh in your
+        of all SSH processes.  If you want to embed passh in your
         asyncio application, use wait().
 
         Returns:
@@ -249,7 +249,7 @@ def main():
     p.add_argument('args', nargs=argparse.REMAINDER)
     ns = p.parse_args()
     hosts = ns.hosts.split(',')
-    ssh = Pssh(hosts, [ns.cmd]+ns.args, infile=ns.infile)
+    ssh = PAssh(hosts, [ns.cmd]+ns.args, infile=ns.infile)
     if not ssh.run():
         print("failed at: {}".format(' '.join(ssh.failed_hosts)),
               file=sys.stderr)
