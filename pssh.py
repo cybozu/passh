@@ -245,10 +245,11 @@ def main():
         usage='%(prog)s [-i FILE] host1[,host2,...] CMD [ARG1 ...]')
     p.add_argument('-i', dest='infile', metavar='FILE', default=None)
     p.add_argument('hosts')
-    p.add_argument('cmd', nargs='+')
+    p.add_argument('cmd')
+    p.add_argument('args', nargs=argparse.REMAINDER)
     ns = p.parse_args()
     hosts = ns.hosts.split(',')
-    ssh = Pssh(hosts, ns.cmd, infile=ns.infile)
+    ssh = Pssh(hosts, [ns.cmd]+ns.args, infile=ns.infile)
     if not ssh.run():
         print("failed at: {}".format(' '.join(ssh.failed_hosts)),
               file=sys.stderr)
