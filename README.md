@@ -80,7 +80,7 @@ Method 1.
 ```python
 import asyncio, passh
 
-p = passh.PAssh(['host-1', 'host-2'], 'date')
+p = passh.PAssh(['host-1', 'host-2'], ['date'])
 task = asyncio.async(p.wait())
 task.add_done_callback(lambda x: ...)  # Use PAssh results.
 ```
@@ -90,7 +90,7 @@ Method 2.
 ```python
 import passh
 
-p = passh.PAssh(['host-1', 'host-2'], 'date')
+p = passh.PAssh(['host-1', 'host-2'], ['date'])
 done, _ = yield from p.wait()
 for task in done:
     task.result()  # check results.
