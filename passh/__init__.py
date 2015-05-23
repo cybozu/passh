@@ -209,6 +209,13 @@ class PAssh:
             task = asyncio.async(p.wait())
             task.add_done_callback(...)  # use PAssh results
 
+        Or you can use "yield from" of cousrse:
+
+            p = passh.PAssh([host1, host2], ['date'])
+            done, _ = yield from p.wait()
+            for task in done:
+                task.result()  # check the result
+
         Returns:
             A coroutine.
         '''
