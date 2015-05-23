@@ -16,17 +16,26 @@ Features
 * Limit on the number of simultaneous SSH processes.
 * Built-in command-line interface.
 
+Install
+-------
+
+passh is available via [PyPI][].
+
+```
+pip3 install passh
+```
+
 Command-line
 ------------
 
 ```
-passh.py [-i FILE] host1,host2,... COMMAND [arg1 arg2 ...]
+passh [-i FILE] host1,host2,... COMMAND [arg1 arg2 ...]
 ```
 
 ### Invoke "date" at once.
 
 ```
-$ ./passh.py host-1,host-2,host-3 date
+$ passh host-1,host-2,host-3 date
 [host-3] Sat May 23 07:20:22 UTC 2015
 [host-1] Sat May 23 07:20:22 UTC 2015
 [host-2] Sat May 23 07:20:22 UTC 2015
@@ -35,7 +44,7 @@ $ ./passh.py host-1,host-2,host-3 date
 ### Send a file at once.
 
 ```
-$ ./passh.py -i $HOME/.bashrc host-1,host-2,host-3 dd of=$HOME/.bashrc
+$ passh -i $HOME/.bashrc host-1,host-2,host-3 dd of=$HOME/.bashrc
 [host-2] 7+1 records in
 [host-2] 7+1 records out
 [host-2] 3650 bytes (3.6 kB) copied, 3.0315e-05 s, 120 MB/s
@@ -85,5 +94,6 @@ Author
 Yamamoto, Hirotaka ([@ymmt2005][])
 
 [asyncio]: https://docs.python.org/3/library/asyncio.html
+[PyPI]: https://pypi.python.org/pypi/passh
 [MIT]: http://opensource.org/licenses/MIT
 [@ymmt2005]: https://github.com/ymmt2005
