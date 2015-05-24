@@ -11,7 +11,7 @@ Features
   * SSH outputs are forwarded to local stdout/stderr.  
     Every line is to be prefixed by the remote hostname.
   * Instead of forwarding, SSH outputs can be collected in memory for later use.
-* Easy to integrate `PAssh` into your asyncio application.
+* Non-asyncio apps can use passh as well as asyncio apps.
 * A file can be given as inputs for all SSH processes.
 * Limit on the number of simultaneous SSH processes.
 * Built-in command-line interface.
@@ -75,17 +75,7 @@ True
 
 ### Embed PAssh into your asyncio application.
 
-Method 1.
-
-```python
-import asyncio, passh
-
-p = passh.PAssh(['host-1', 'host-2'], ['date'])
-task = asyncio.async(p.wait())
-task.add_done_callback(lambda x: ...)  # Use PAssh results.
-```
-
-Method 2.
+Use `yield from` to asynchronously wait the result:
 
 ```python
 import passh
@@ -94,6 +84,18 @@ p = passh.PAssh(['host-1', 'host-2'], ['date'])
 done, _ = yield from p.wait()
 for task in done:
     task.result()  # check results.
+if len(p.failed_hosts) > 0:
+    # handle failures
+```
+
+Use `asyncio.async` to schedule passh as an independent coroutine:
+
+```python
+import asyncio, passh
+
+p = passh.PAssh(['host-1', 'host-2'], ['date'])
+task = asyncio.async(p.wait())
+task.add_done_callback(lambda x: ...)  # handle PAssh results.
 ```
 
 License
