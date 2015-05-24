@@ -29,7 +29,7 @@ Command-line
 ------------
 
 ```
-passh [-i FILE] host1,host2,... COMMAND [arg1 arg2 ...]
+passh [-n PROCS] [-i FILE] host1,host2,... COMMAND [arg1 arg2 ...]
 ```
 
 ### Invoke "date" at once.

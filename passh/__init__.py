@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # Copyright (c) 2015 Cybozu.
 # Released under the MIT license
 # http://opensource.org/licenses/mit-license.php
@@ -9,6 +8,7 @@ Execute SSH in parallel.
 import argparse
 import asyncio
 import functools
+from os.path import exists
 import sys
 
 
@@ -249,14 +249,18 @@ class PAssh:
 def main():
     p = argparse.ArgumentParser(
         description='Run SSH in parallel',
-        usage='%(prog)s [-i FILE] host1[,host2,...] CMD [ARG1 ...]')
+        usage='%(prog)s [-n PROCS] [-i FILE] host1[,host2,...] CMD [ARG1 ...]')
+    p.add_argument('-n', dest='procs', metavar='PROCS', type=int, default=50)
     p.add_argument('-i', dest='infile', metavar='FILE', default=None)
     p.add_argument('hosts')
     p.add_argument('cmd')
     p.add_argument('args', nargs=argparse.REMAINDER)
     ns = p.parse_args()
     hosts = ns.hosts.split(',')
-    ssh = PAssh(hosts, [ns.cmd]+ns.args, infile=ns.infile)
+    if ns.infile is not None and not exists(ns.infile):
+        print('No such file:', ns.infile, file=sys.stderr)
+        sys.exit(1)
+    ssh = PAssh(hosts, [ns.cmd]+ns.args, infile=ns.infile, nprocs=ns.procs)
     if not ssh.run():
         print("failed at: {}".format(' '.join(ssh.failed_hosts)),
               file=sys.stderr)
