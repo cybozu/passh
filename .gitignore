@@ -1,2 +1,4 @@
 dist
 passh.egg-info
+*.pyc
+__pycache__
