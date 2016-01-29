@@ -138,9 +138,8 @@ class PAssh:
         self._args = args
         self._infile = infile
         self._use_stdout = use_stdout
+        self._nprocs = nprocs
         self._sem = None
-        if nprocs > 0:
-            self._sem = asyncio.Semaphore(nprocs, loop=self._loop)
         self._secure = not insecure
 
         self._failures = []
@@ -187,9 +186,11 @@ class PAssh:
     @asyncio.coroutine
     def _run(self, host: str):
         try:
-            if self._sem is None:
+            if self._nprocs == 0:
                 yield from self._run1(host)
                 return
+            if self._sem is None:
+                self._sem = asyncio.Semaphore(self._nprocs, loop=self._loop)
             with (yield from self._sem):
                 yield from self._run1(host)
         except Exception as e:
@@ -235,11 +236,15 @@ class PAssh:
         '''
         if len(self._hosts) == 0:
             return True
+        self._loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self._loop)
         try:
             self._cancel_on_error = True
             self._loop.run_until_complete(self.wait())
         except asyncio.CancelledError:
             pass
+        finally:
+            self._loop.close()
         if self._exc is not None:
             # pylint: disable=E0702
             raise self._exc
